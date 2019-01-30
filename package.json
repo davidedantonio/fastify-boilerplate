@@ -1,0 +1,25 @@
+{
+  "name": "fastify-boilerplate",
+  "version": "0.1.0",
+  "description": "Create a ready to use fastify project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "fastify"
+  ],
+  "author": "Davide D'Antonio <davide.dantonio@webeetle.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "fastify": "^1.13.4",
+    "fastify-plugin": "^1.4.0",
+    "pino-colada": "^1.4.4"
+  },
+  "devDependencies": {
+    "pre-commit": "^1.2.2",
+    "standard": "^12.0.1",
+    "tap": "^12.5.0"
+  }
+}
