@@ -1,5 +1,3 @@
-#! /usr/bin/env node
-
 'use strict'
 
 const assert = require('assert')
@@ -43,10 +41,10 @@ function start (args, cb) {
   }
 
   loadModules(opts)
-  return runFastify(args, cb)
+  return run(args, cb)
 }
 
-function runFastify (args, cb) {
+function run (args, cb) {
   require('dotenv').config()
   let opts = parseArgs(args)
 
@@ -69,7 +67,7 @@ function cli (args) {
   start(args)
 }
 
-module.exports = { start, runFastify, stop }
+module.exports = { start, run, stop }
 
 if (require.main === module) {
   cli(process.argv.slice(2))
