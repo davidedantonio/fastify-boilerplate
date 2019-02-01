@@ -6,12 +6,11 @@ module.exports = function parseArgs (args) {
   const parsedArgs = argv(args, {
     number: ['port', 'body-limit', 'plugin-timeout'],
     boolean: ['pretty-logs', 'options', 'watch'],
-    string: ['log-level', 'address', 'socket', 'prefix', 'ignore-watch', 'file'],
+    string: ['log-level', 'address', 'prefix', 'ignore-watch', 'file'],
     envPrefix: 'FASTIFY_',
     alias: {
       address: ['a'],
       port: ['p'],
-      socket: ['s'],
       options: ['o'],
       watch: ['W'],
       prefix: ['r'],
@@ -21,12 +20,12 @@ module.exports = function parseArgs (args) {
     },
     default: {
       'log-level': 'error',
-      'pretty-logs': false,
+      'pretty-logs': true,
       'watch': false,
       'ignore-watch': 'node_modules build dist .gitignore .idea .bower_components logs',
       'options': false,
       'plugin-timeout': 10 * 1000,
-      'file': 'app.js'
+      'file': 'app/app.js'
     }
   })
 
