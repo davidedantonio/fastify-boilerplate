@@ -1,13 +1,16 @@
 'use strict'
 
 const assert = require('assert')
-const parseArgs = require('./args')
+const fp = require('fastify-plugin')
 const fs = require('fs')
-const path = require('path')
+const isDocker = require('is-docker')
 const resolveFrom = require('resolve-from')
+const parseArgs = require('./args')
+const path = require('path')
+const PinoColada = require('pino-colada')
+const pump = require('pump')
 
 let Fastify = null
-let fastifyPackageJSON = null
 
 function showHelp () {
   console.log(fs.readFileSync(path.join(__dirname, 'help', 'start.txt'), 'utf8'))
@@ -60,7 +63,56 @@ function run (args, cb) {
     return module.exports.stop(e)
   }
 
-  console.log(file.constructor.name)
+  if (file.length !== 3 && file.constructor.name === 'Function') {
+    return module.exports.stop(`Plugin function should contain 3 arguments. Refer to\n
+      docs for more information about it`)
+  }
+
+  if (file.length !== 2 && file.constructor.name === 'AsyncFunction') {
+    return module.exports.stop(`Aysnc/Await plugin function should contain 2 arguments. Refer to\n
+      docs for more information about it`)
+  }
+
+  const options = {
+    logger: {
+      level: opts.logLevel
+    },
+    pluginTimeout: opts.pluginTimeout
+  }
+
+  if (opts.bodyLimit) {
+    options.bodyLimit = opts.bodyLimit
+  }
+
+  if (opts.prettyLogs) {
+    const pinoColada = PinoColada()
+    options.logger.stream = pinoColada
+    pump(pinoColada, process.stdout, assert.ifError)
+  }
+
+  const fastify = Fastify(opts.option ? Object.assign(options, file.options) : options)
+
+  const pluginOptions = {}
+  if (opts.prefix) {
+    pluginOptions.prefix = opts.prefix
+    pluginOptions._routePrefix = opts.prefix || ''
+  }
+
+  fastify.register(fp(file), pluginOptions)
+
+  if (opts.address) {
+    fastify.listen(opts.port, opts.address, wrap)
+  } else if (isDocker()) {
+    fastify.listen(opts.port, '0.0.0.0', wrap)
+  } else {
+    fastify.listen(opts.port, wrap)
+  }
+
+  function wrap (err) {
+    cb(err, fastify)
+  }
+
+  return fastify
 }
 
 function cli (args) {
